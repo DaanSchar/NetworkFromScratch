@@ -19,9 +19,9 @@ public class Network {
     public Network(int numInputs, int hiddenSize, int numOutputs, IActivationFunction activationFunction) {
         this.numInputs = numInputs;
         this.activationFunction = activationFunction;
-//        this.hiddenWeights = NDArray.rand(hiddenSize, numInputs + 1);
-//        this.weights = NDArray.rand(numOutputs, hiddenSize + 1);
-        this.weights = NDArray.zeros(numOutputs, numInputs + 1);
+        this.hiddenWeights = NDArray.rand(hiddenSize, numInputs + 1);
+        this.weights = NDArray.rand(numOutputs, hiddenSize + 1);
+//        this.weights = NDArray.zeros(numOutputs, numInputs + 1);
     }
 
     public void train(NDArray xTrain, NDArray yTrain) {
@@ -35,13 +35,31 @@ public class Network {
         this.yTrain = yTrain;
 
         for (int i = 0; i < 100000; i++) {
-            backpropagation();
+            denseLayerBackpropagation();
         }
     }
 
-    private void backpropagation() {
-        NDArray costMatrix = cost(yTrain, feedForward(xTrain));
-        NDArray gradient = costMatrix.T().dot(addBiases(xTrain));
+    public NDArray predict(NDArray inputs) {
+        return layeredFeedForward(inputs);
+    }
+
+    private NDArray layer1FeedForward(NDArray inputs) {
+        inputs = addBiases(inputs);
+        return hiddenWeights.dot(inputs.T()).activation(activationFunction).T();
+    }
+
+    private NDArray layeredFeedForward(NDArray inputs) {
+        return layer2FeedForward(layer1FeedForward(inputs));
+    }
+
+    private NDArray layer2FeedForward(NDArray inputs) {
+        inputs = addBiases(inputs);
+        return weights.dot(inputs).activation(activationFunction).T();
+    }
+
+    private void denseLayerBackpropagation() {
+        NDArray costMatrix = cost(yTrain, layer2FeedForward(layer1FeedForward(xTrain)));
+        NDArray gradient = costMatrix.T().dot(addBiases((layer1FeedForward(xTrain))));
         weights = weights.add(gradient.mul(0.01));
     }
 
@@ -49,21 +67,6 @@ public class Network {
         return y.sub(yHat);
     }
 
-
-    public NDArray predict(NDArray inputs) {
-        return feedForward(inputs);
-    }
-
-    private NDArray feedForward(NDArray inputs) {
-        inputs = addBiases(inputs);
-//        NDArray hidden = inputs.dot(hiddenWeights).activation(activationFunction);
-//        System.out.println(hidden);
-//        hidden = hiddenWeights.dot(inputs.T()).activation(activationFunction).T();
-//        System.out.println(hidden);
-//        return weights.dot(inputs.T()).activation(activationFunction).T();
-        return weights.dot(inputs.T()).activation(activationFunction).T();
-//        return null;
-    }
 
     /**
      * Concatenates a double column of ones to the beginning of an NDArray.

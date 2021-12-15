@@ -102,7 +102,7 @@ public class NDArray {
      */
     public NDArray add(NDArray other) {
         if (this.shape[0] != other.shape[0] || this.shape[1] != other.shape[1])
-            throw new IllegalArgumentException("Incompatible shapes");
+            throw new IllegalArgumentException("Incompatible shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape));
 
         double[][] newData = new double[this.shape[0]][this.shape[1]];
 

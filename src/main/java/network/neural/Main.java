@@ -30,7 +30,6 @@ public class Main {
 
 
 
-//        network.train(input, output);
         network.train(input, output);
         System.out.println(network.predict(input));
 //        System.out.println(network.getWeights());
