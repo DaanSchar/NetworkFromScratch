@@ -42,7 +42,7 @@ public class NDArray {
      */
     public NDArray dot(NDArray other) {
         if (this.shape[1] != other.shape[0])
-            throw new IllegalArgumentException("Incompatible shapes");
+            throw new IllegalArgumentException("Incompatible shapes" + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape));
 
         int cols = other.shape[1];
         int rows = this.shape[0];
@@ -70,6 +70,19 @@ public class NDArray {
                 result[i][j] = data[i][j] * scalar;
 
         return new NDArray(result);
+    }
+
+    public NDArray mul(NDArray other) {
+        if (this.shape[0] != other.shape[0] || this.shape[1] != other.shape[1])
+            throw new IllegalArgumentException("Incompatible shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape));
+
+        double[][] newData = new double[this.shape[0]][this.shape[1]];
+
+        for (int i = 0; i < this.shape[0]; i++)
+            for (int j = 0; j < this.shape[1]; j++)
+                newData[i][j] = this.data[i][j] * other.data[i][j];
+
+        return new NDArray(newData);
     }
 
     public NDArray pow(int power) {

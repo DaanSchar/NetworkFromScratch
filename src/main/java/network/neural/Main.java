@@ -11,27 +11,21 @@ public class Main {
 
         NDArray input = new NDArray(new double[][]{
                 {0, 0},
-                {0, 1},
-                {1, 0},
-                {1, 1},
         });
         NDArray output = new NDArray(new double[][]{
                 {1, 0},
-                {0, 1},
-                {0, 1},
-                {0, 1},
         });
-//        output = new NDArray(new double[][]{
-//                {0},
-//                {1},
-//                {1},
-//                {0},
-//        });
+        output = new NDArray(new double[][]{
+                {0},
+                {1},
+                {1},
+                {0},
+        });
 
 
 
         network.train(input, output);
-        System.out.println(network.predict(input));
+//        System.out.println(network.predict(input));
 //        System.out.println(network.getWeights());
 
     }

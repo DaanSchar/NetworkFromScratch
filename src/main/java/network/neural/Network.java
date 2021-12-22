@@ -9,6 +9,10 @@ public class Network {
 
     private NDArray weights;
     private NDArray hiddenWeights;
+
+    private NDArray biases;
+    private NDArray hiddenBiases;
+
     private int numInputs;
 
     private IActivationFunction activationFunction;
@@ -19,8 +23,13 @@ public class Network {
     public Network(int numInputs, int hiddenSize, int numOutputs, IActivationFunction activationFunction) {
         this.numInputs = numInputs;
         this.activationFunction = activationFunction;
+
         this.hiddenWeights = NDArray.rand(hiddenSize, numInputs + 1);
         this.weights = NDArray.rand(numOutputs, hiddenSize + 1);
+
+        this.biases = NDArray.rand(hiddenSize, 1);
+        this.hiddenBiases = NDArray.rand(numOutputs, 1);
+
 //        this.weights = NDArray.zeros(numOutputs, numInputs + 1);
     }
 
@@ -36,6 +45,7 @@ public class Network {
 
         for (int i = 0; i < 100000; i++) {
             denseLayerBackpropagation();
+            hiddenLayerBackPropagation();
         }
     }
 
@@ -57,8 +67,20 @@ public class Network {
         return weights.dot(inputs).activation(activationFunction).T();
     }
 
+    private void hiddenLayerBackPropagation() {
+        NDArray costMatrix = cost(yTrain, layeredFeedForward(xTrain));
+        System.out.println(hiddenWeights.T());
+        costMatrix = addBiases(costMatrix);
+        NDArray gradient = hiddenWeights.T().dot(costMatrix.T());
+        System.out.println(gradient);
+
+//        NDArray gradient2 = gradient.mul(layer1FeedForward(xTrain).gradient(activationFunction));
+//        System.out.println(gradient2);
+//        hiddenWeights = hiddenWeights.add(gradient2.mul(0.01));
+    }
+
     private void denseLayerBackpropagation() {
-        NDArray costMatrix = cost(yTrain, layer2FeedForward(layer1FeedForward(xTrain)));
+        NDArray costMatrix = cost(yTrain, layeredFeedForward(xTrain));
         NDArray gradient = costMatrix.T().dot(addBiases((layer1FeedForward(xTrain))));
         weights = weights.add(gradient.mul(0.01));
     }
@@ -66,7 +88,6 @@ public class Network {
     private NDArray cost(NDArray y, NDArray yHat) {
         return y.sub(yHat);
     }
-
 
     /**
      * Concatenates a double column of ones to the beginning of an NDArray.
