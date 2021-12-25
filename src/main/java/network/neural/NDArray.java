@@ -34,6 +34,10 @@ public class NDArray {
         return new NDArray(newData);
     }
 
+    public NDArray getRow(int row) {
+        return new NDArray(new double[][] {data[row]});
+    }
+
     /**
      * performs matrix dot product on two NDArrays
      *
@@ -115,7 +119,7 @@ public class NDArray {
      */
     public NDArray add(NDArray other) {
         if (this.shape[0] != other.shape[0] || this.shape[1] != other.shape[1])
-            throw new IllegalArgumentException("Incompatible shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape));
+            throw new IllegalArgumentException("Incompatible shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape()));
 
         double[][] newData = new double[this.shape[0]][this.shape[1]];
 
@@ -179,6 +183,43 @@ public class NDArray {
         return new NDArray(result);
     }
 
+
+    public NDArray addVector(NDArray vector) {
+        if (vector.shape[0] != 1 && vector.shape[1] != 1)
+            throw new IllegalArgumentException("Incompatible shapes. " + Arrays.toString(vector.shape) + " is not a vector");
+        if (vector.shape[0] == 1)
+            return this.addRowVector(vector);
+        if (vector.shape[1] == 1)
+            return this.addColumnVector(vector);
+
+        return null;
+    }
+
+    private NDArray addRowVector(NDArray vector) {
+        if (this.shape[1] != vector.shape[1])
+            throw new IllegalArgumentException("Incompatible shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(vector.shape()));
+
+        double[][] result = new double[this.shape[0]][ this.shape[1]];
+
+        for (int i = 0; i < this.shape[0]; i++)
+            for (int j = 0; j < this.shape[1]; j++)
+                result[i][j] = this.data[i][j] + vector.data[0][j];
+
+        return new NDArray(result);
+    }
+
+    private NDArray addColumnVector(NDArray vector) {
+        if (this.shape[0] != vector.shape[0])
+            throw new IllegalArgumentException("Incompatible shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(vector.shape()));
+
+        double[][] result = new double[this.shape[0]][ this.shape[1]];
+
+        for (int i = 0; i < this.shape[0]; i++)
+            for (int j = 0; j < this.shape[1]; j++)
+                result[i][j] = this.data[i][j] + vector.data[i][0];
+
+        return new NDArray(result);
+    }
 
     @Override
     public String toString() {

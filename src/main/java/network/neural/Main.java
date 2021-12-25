@@ -7,26 +7,29 @@ public class Main {
 
 
     public static void main(String[] args) {
-        Network network = new Network(2, 3,2, new Sigmoid());
+        Network network = new Network(2, 3,1, new Sigmoid());
 
         NDArray input = new NDArray(new double[][]{
                 {0, 0},
+                {0, 1},
+                {1, 0},
+                {1, 1}
         });
         NDArray output = new NDArray(new double[][]{
                 {1, 0},
         });
         output = new NDArray(new double[][]{
+                {1},
                 {0},
-                {1},
-                {1},
+                {0},
                 {0},
         });
 
 
 
-        network.train(input, output);
+//        network.fit(input, output, 1000);
+        network.derivative(input, output);
 //        System.out.println(network.predict(input));
-//        System.out.println(network.getWeights());
 
     }
 }
