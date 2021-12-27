@@ -222,6 +222,17 @@ public class NDArray {
         return new NDArray(result);
     }
 
+    public NDArray getAvgColVector() {
+        double[][] result = new double[this.shape[0]][1];
+
+        for (int i = 0; i < this.shape[0]; i++)
+            result[i][0] = this.getRow(i).sum() / this.shape[1];
+
+        return new NDArray(result);
+    }
+
+
+
     @Override
     public String toString() {
         StringBuilder data = new StringBuilder("[");
