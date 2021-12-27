@@ -3,6 +3,7 @@ package network.neural;
 import network.neural.activationfunctions.IActivationFunction;
 
 import java.util.Arrays;
+import java.util.Random;
 
 public class NDArray {
 
@@ -187,7 +188,7 @@ public class NDArray {
     public NDArray addVector(NDArray vector) {
         if (vector.shape[0] != 1 && vector.shape[1] != 1)
             throw new IllegalArgumentException("Incompatible shapes. " + Arrays.toString(vector.shape) + " is not a vector");
-        if (vector.shape[0] == 1)
+        if (vector.shape[0] == 1 && this.shape[1] == vector.shape[1])
             return this.addRowVector(vector);
         if (vector.shape[1] == 1)
             return this.addColumnVector(vector);
@@ -223,10 +224,10 @@ public class NDArray {
 
     @Override
     public String toString() {
-        String data = "[";
+        StringBuilder data = new StringBuilder("[");
         for (int i = 0; i < this.data.length; i++) {
             String nextLine = i  == this.data.length - 1 ? "" : "\n ";
-            data += Arrays.toString(this.data[i]) + nextLine;
+            data.append(Arrays.toString(this.data[i])).append(nextLine);
         }
 
         return "shape=" + Arrays.toString(shape) + "\n" + data + "]";
@@ -282,6 +283,27 @@ public class NDArray {
         for (int i = 0; i < data.length; i++)
             for (int j = 0; j < data[0].length; j++)
                 data[i][j] = Math.random();
+
+        return new NDArray(data);
+    }
+
+    /**
+     * random initialisation of the NDArray
+     *
+     * @param shape The shape of the NDArray
+     * @return A new NDArray with random values between the values
+     *         max and -max
+     */
+    public static NDArray rand(double max, int... shape) {
+        if (shape.length > 2 || shape.length < 1)
+            throw new IllegalArgumentException("Invalid shape, must be 1 or 2 dimensions");
+
+        double[][] data = new double[shape[0]][shape[1]];
+        Random r = new Random();
+
+        for (int i = 0; i < data.length; i++)
+            for (int j = 0; j < data[0].length; j++)
+                data[i][j] = Math.random() * 2 * max - max;
 
         return new NDArray(data);
     }
