@@ -30,7 +30,7 @@ This layer uses Sigmoid for its activation function.
 nn.layer(new Layer(4, 1, new Sigmoid()))
 ```
 
-We set the learning rate to 0.01
+Define a learning rate
 ```
 nn.learningRate(0.01)
 ```
