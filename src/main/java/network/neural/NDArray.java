@@ -2,10 +2,11 @@ package network.neural;
 
 import network.neural.activationfunctions.IActivationFunction;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
 
-public class NDArray {
+public class NDArray implements Serializable {
 
     private int[] shape;
     private double[][] data;

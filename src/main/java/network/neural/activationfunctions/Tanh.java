@@ -1,6 +1,8 @@
 package network.neural.activationfunctions;
 
-public class Tanh implements IActivationFunction{
+import java.io.Serializable;
+
+public class Tanh implements IActivationFunction, Serializable {
     @Override
     public double get(double x) {
         return Math.tanh(x);

@@ -1,10 +1,9 @@
 package network.neural;
 
-import network.neural.layers.Layer;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class MultiNetwork {
+public class MultiNetwork implements Serializable {
 
     private final ArrayList<Layer> layers;
     private final int inputSize;
@@ -84,6 +83,27 @@ public class MultiNetwork {
 
         if (costGraph)
             createCostGraph(errors);
+    }
+
+
+    /**
+     * saves the state of the network to a file
+     *
+     * @param path location of the file
+     */
+    public void save(String path) {
+        ObjectIO.WriteObjectToFile(this, path);
+    }
+
+
+    /**
+     * load a neural network from a file.
+     *
+     * @param path location of the file
+     * @return the neural network
+     */
+    public static MultiNetwork load(String path) {
+        return (MultiNetwork) ObjectIO.readObjectFromFile(path);
     }
 
 

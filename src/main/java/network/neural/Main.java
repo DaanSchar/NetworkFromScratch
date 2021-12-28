@@ -2,7 +2,6 @@ package network.neural;
 
 import network.neural.activationfunctions.ReLU;
 import network.neural.activationfunctions.Sigmoid;
-import network.neural.layers.Layer;
 
 public class Main {
 

@@ -1,8 +1,6 @@
 package network.neural.activationfunctions;
 
-import network.neural.NDArray;
-
-public interface IActivationFunction {
+public interface IActivationFunction{
 
     /**
      * Applies the activation function to the given input.

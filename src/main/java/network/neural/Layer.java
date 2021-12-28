@@ -1,11 +1,10 @@
-package network.neural.layers;
+package network.neural;
 
-import network.neural.LayerOutput;
-import network.neural.MultiNetwork;
-import network.neural.NDArray;
 import network.neural.activationfunctions.IActivationFunction;
 
-public class Layer {
+import java.io.Serializable;
+
+public class Layer implements Serializable {
 
     private int inputSize;
     private int outputSize;
