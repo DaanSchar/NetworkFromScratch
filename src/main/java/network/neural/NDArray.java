@@ -2,9 +2,11 @@ package network.neural;
 
 import network.neural.activationfunctions.IActivationFunction;
 
+import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Random;
 
-public class NDArray {
+public class NDArray implements Serializable {
 
     private int[] shape;
     private double[][] data;
@@ -34,6 +36,10 @@ public class NDArray {
         return new NDArray(newData);
     }
 
+    public NDArray getRow(int row) {
+        return new NDArray(new double[][] {data[row]});
+    }
+
     /**
      * performs matrix dot product on two NDArrays
      *
@@ -42,7 +48,7 @@ public class NDArray {
      */
     public NDArray dot(NDArray other) {
         if (this.shape[1] != other.shape[0])
-            throw new IllegalArgumentException("Incompatible shapes");
+            throw new IllegalArgumentException("Incompatible shapes" + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape));
 
         int cols = other.shape[1];
         int rows = this.shape[0];
@@ -70,6 +76,19 @@ public class NDArray {
                 result[i][j] = data[i][j] * scalar;
 
         return new NDArray(result);
+    }
+
+    public NDArray mul(NDArray other) {
+        if (this.shape[0] != other.shape[0] || this.shape[1] != other.shape[1])
+            throw new IllegalArgumentException("Incompatible shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape));
+
+        double[][] newData = new double[this.shape[0]][this.shape[1]];
+
+        for (int i = 0; i < this.shape[0]; i++)
+            for (int j = 0; j < this.shape[1]; j++)
+                newData[i][j] = this.data[i][j] * other.data[i][j];
+
+        return new NDArray(newData);
     }
 
     public NDArray pow(int power) {
@@ -102,7 +121,7 @@ public class NDArray {
      */
     public NDArray add(NDArray other) {
         if (this.shape[0] != other.shape[0] || this.shape[1] != other.shape[1])
-            throw new IllegalArgumentException("Incompatible shapes");
+            throw new IllegalArgumentException("Incompatible shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(other.shape()));
 
         double[][] newData = new double[this.shape[0]][this.shape[1]];
 
@@ -167,12 +186,60 @@ public class NDArray {
     }
 
 
+    public NDArray addVector(NDArray vector) {
+        if (vector.shape[0] != 1 && vector.shape[1] != 1)
+            throw new IllegalArgumentException("Incompatible shapes. " + Arrays.toString(vector.shape) + " is not a vector");
+        if (vector.shape[0] == 1 && this.shape[1] == vector.shape[1])
+            return this.addRowVector(vector);
+        if (vector.shape[1] == 1)
+            return this.addColumnVector(vector);
+
+        return null;
+    }
+
+    private NDArray addRowVector(NDArray vector) {
+        if (this.shape[1] != vector.shape[1])
+            throw new IllegalArgumentException("Incompatible shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(vector.shape()));
+
+        double[][] result = new double[this.shape[0]][ this.shape[1]];
+
+        for (int i = 0; i < this.shape[0]; i++)
+            for (int j = 0; j < this.shape[1]; j++)
+                result[i][j] = this.data[i][j] + vector.data[0][j];
+
+        return new NDArray(result);
+    }
+
+    private NDArray addColumnVector(NDArray vector) {
+        if (this.shape[0] != vector.shape[0])
+            throw new IllegalArgumentException("Incompatible shapes " + Arrays.toString(this.shape) + " and " + Arrays.toString(vector.shape()));
+
+        double[][] result = new double[this.shape[0]][ this.shape[1]];
+
+        for (int i = 0; i < this.shape[0]; i++)
+            for (int j = 0; j < this.shape[1]; j++)
+                result[i][j] = this.data[i][j] + vector.data[i][0];
+
+        return new NDArray(result);
+    }
+
+    public NDArray getAvgColVector() {
+        double[][] result = new double[this.shape[0]][1];
+
+        for (int i = 0; i < this.shape[0]; i++)
+            result[i][0] = this.getRow(i).sum() / this.shape[1];
+
+        return new NDArray(result);
+    }
+
+
+
     @Override
     public String toString() {
-        String data = "[";
+        StringBuilder data = new StringBuilder("[");
         for (int i = 0; i < this.data.length; i++) {
             String nextLine = i  == this.data.length - 1 ? "" : "\n ";
-            data += Arrays.toString(this.data[i]) + nextLine;
+            data.append(Arrays.toString(this.data[i])).append(nextLine);
         }
 
         return "shape=" + Arrays.toString(shape) + "\n" + data + "]";
@@ -228,6 +295,27 @@ public class NDArray {
         for (int i = 0; i < data.length; i++)
             for (int j = 0; j < data[0].length; j++)
                 data[i][j] = Math.random();
+
+        return new NDArray(data);
+    }
+
+    /**
+     * random initialisation of the NDArray
+     *
+     * @param shape The shape of the NDArray
+     * @return A new NDArray with random values between the values
+     *         max and -max
+     */
+    public static NDArray rand(double max, int... shape) {
+        if (shape.length > 2 || shape.length < 1)
+            throw new IllegalArgumentException("Invalid shape, must be 1 or 2 dimensions");
+
+        double[][] data = new double[shape[0]][shape[1]];
+        Random r = new Random();
+
+        for (int i = 0; i < data.length; i++)
+            for (int j = 0; j < data[0].length; j++)
+                data[i][j] = Math.random() * 2 * max - max;
 
         return new NDArray(data);
     }

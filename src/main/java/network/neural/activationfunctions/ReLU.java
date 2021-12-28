@@ -1,6 +1,8 @@
 package network.neural.activationfunctions;
 
-public class ReLU implements IActivationFunction{
+import java.io.Serializable;
+
+public class ReLU implements IActivationFunction, Serializable {
 
     @Override
     public double get(double x) {

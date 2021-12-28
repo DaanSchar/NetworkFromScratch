@@ -1,6 +1,8 @@
 package network.neural.activationfunctions;
 
-public class Linear implements IActivationFunction{
+import java.io.Serializable;
+
+public class Linear implements IActivationFunction, Serializable {
     @Override
     public double get(double x) {
         return x;

@@ -2,13 +2,18 @@ package network.neural;
 
 import network.neural.activationfunctions.IActivationFunction;
 
+
 /**
- * Simple 1 layer network.
+ * "Simple" 2 layer network.
  */
 public class Network {
 
     private NDArray weights;
     private NDArray hiddenWeights;
+
+    private NDArray biases;
+    private NDArray hiddenBiases;
+
     private int numInputs;
 
     private IActivationFunction activationFunction;
@@ -16,76 +21,124 @@ public class Network {
     private NDArray xTrain;
     private NDArray yTrain;
 
+    private double learningRate = 0.01;
+
     public Network(int numInputs, int hiddenSize, int numOutputs, IActivationFunction activationFunction) {
         this.numInputs = numInputs;
         this.activationFunction = activationFunction;
-//        this.hiddenWeights = NDArray.rand(hiddenSize, numInputs + 1);
-//        this.weights = NDArray.rand(numOutputs, hiddenSize + 1);
-        this.weights = NDArray.zeros(numOutputs, numInputs + 1);
+
+        double epsilon = Math.sqrt(6) / (numInputs + hiddenSize);
+
+        this.hiddenWeights = NDArray.rand(epsilon, hiddenSize, numInputs);
+        this.weights = NDArray.rand(epsilon, numOutputs, hiddenSize);
+
+        this.hiddenBiases = NDArray.rand(hiddenSize,1);
+        this.biases = NDArray.rand(numOutputs, 1);
     }
 
-    public void train(NDArray xTrain, NDArray yTrain) {
-        if (xTrain.shape()[1] != numInputs)
-            throw new IllegalArgumentException("Expected " + numInputs + " inputs.");
 
-        if (xTrain.shape()[0] != yTrain.shape()[0])
-            throw new IllegalArgumentException("training set is inconsistent.");
+    /**
+     * Trains the network using forward and backward propagation.
+     *
+     * @param X training data
+     * @param Y labels
+     */
+    public void train(NDArray X, NDArray Y, int epochs) {
+        this.xTrain = X;
+        this.yTrain = Y;
 
-        this.xTrain = xTrain;
-        this.yTrain = yTrain;
+        double[] costs = new double[epochs];
 
-        for (int i = 0; i < 100000; i++) {
-            backpropagation();
+        for (int i = 0; i < epochs; i++) {
+            costs[i] = backpropagation();
         }
-    }
 
-    private void backpropagation() {
-        NDArray costMatrix = cost(yTrain, feedForward(xTrain));
-        NDArray gradient = costMatrix.T().dot(addBiases(xTrain));
-        weights = weights.add(gradient.mul(0.01));
-    }
-
-    private NDArray cost(NDArray y, NDArray yHat) {
-        return y.sub(yHat);
-    }
-
-
-    public NDArray predict(NDArray inputs) {
-        return feedForward(inputs);
-    }
-
-    private NDArray feedForward(NDArray inputs) {
-        inputs = addBiases(inputs);
-//        NDArray hidden = inputs.dot(hiddenWeights).activation(activationFunction);
-//        System.out.println(hidden);
-//        hidden = hiddenWeights.dot(inputs.T()).activation(activationFunction).T();
-//        System.out.println(hidden);
-//        return weights.dot(inputs.T()).activation(activationFunction).T();
-        return weights.dot(inputs.T()).activation(activationFunction).T();
-//        return null;
+//        // plot the cost
+//        CostChart chart = new CostChart(
+//                costs,
+//                "Average Cost",
+//                "Epoch",
+//                "Cost"
+//        );
+//        chart.setVisible(true);
     }
 
     /**
-     * Concatenates a double column of ones to the beginning of an NDArray.
-     * @param input
-     * @return
+     * Predict the output of the network by using forward propagation.
+     *
+     * @param inputs input data we want to make a prediction on
+     * @return the prediction
      */
-    private NDArray addBiases(NDArray input) {
-        double[][] result = new double[input.shape()[0]][input.shape()[1] + 1];
-
-        double[][] inputArray = input.data();
-
-        for (int i = 0; i < input.shape()[0]; i++) {
-            result[i][0] = 1;
-            for (int j = 0; j < input.shape()[1]; j++) {
-                result[i][j + 1] = inputArray[i][j];
-            }
-        }
-
-        return new NDArray(result);
+    public NDArray predict(NDArray inputs) {
+        NDArray z2 = hiddenWeights.dot(inputs.T()).addVector(hiddenBiases).T();
+        NDArray a2 = z2.activation(activationFunction);
+        NDArray z3 = weights.dot(a2.T()).addVector(biases).T();
+        NDArray a3 = z3.activation(activationFunction);
+        return a3;
     }
 
-    public NDArray getWeights() {
-        return weights;
+
+    /**
+     * Backpropagation algorithm.
+     *
+     * derivative of a FinalLayer L = derivative(cost) * activation'(z^L)
+     * derivative of any other layer l = (W^l+1 dot derivative^l+1) * activation'(z^l)
+     *
+     * bias^l = bias^l + derivative^l
+     * weights^l = weights^l + derivative^l dot activation^l-1
+     *
+     * @return cost of the current state of the weights and biases on the
+     *         training data.
+     */
+    private double backpropagation() {
+        // Forward propagation
+        NDArray z2 = hiddenWeights.dot(xTrain.T()).addVector(hiddenBiases).T();
+        NDArray a2 = z2.activation(activationFunction);
+        NDArray z3 = weights.dot(a2.T()).addVector(biases).T();
+        NDArray a3 = z3.activation(activationFunction);
+
+        // last layer error = cost'(a) * activation'(z)
+        NDArray errorLastLayer = costDerivative(yTrain, a3)
+                .mul(
+                        z3.gradient(activationFunction)
+                ).T();
+
+        // hidden layer error = W^T dot errorLastLayer * activation'(z)^T
+        NDArray errorHiddenLayer = weights.T().dot(errorLastLayer).mul(z2.gradient(activationFunction).T());
+
+        // new biases = old biases + alpha*error
+        this.biases = biases.add(errorLastLayer.mul(learningRate).getAvgColVector());
+        this.hiddenBiases = hiddenBiases.add(errorHiddenLayer.mul(learningRate).getAvgColVector());
+
+        // new weights = old weights + alpha*error dot (activation of previous layer)
+        this.weights = weights.add(errorLastLayer.dot(a2).mul(learningRate));
+        this.hiddenWeights = hiddenWeights.add(errorHiddenLayer.dot(xTrain).mul(learningRate));
+
+        return (cost(yTrain, a3).sum());
     }
+
+
+    /**
+     * Cost function.
+     *
+     * @param y labels
+     * @param yHat predictions
+     * @return error squared vector
+     */
+    private NDArray cost(NDArray y, NDArray yHat) {
+        return y.sub(yHat).pow(2);
+    }
+
+
+    /**
+     * Derivative of the cost function.
+     *
+     * @param y labels
+     * @param yHat predictions
+     * @return error' vector
+     */
+    private NDArray costDerivative(NDArray y, NDArray yHat) {
+        return y.sub(yHat).mul(2);
+    }
+
 }
