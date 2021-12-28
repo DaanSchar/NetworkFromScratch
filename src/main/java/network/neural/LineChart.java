@@ -15,22 +15,32 @@ import org.jfree.data.xy.XYSeriesCollection;
 import javax.swing.*;
 import java.awt.*;
 
-public class CostChart extends JFrame {
+public class LineChart extends JFrame {
 
-    private String title = "Title";
-    private String xLabel = "X";
-    private String yLabel = "Y";
+    protected String title = "Title";
+    protected String xLabel = "X";
+    protected String yLabel = "Y";
+    protected double[] x;
+    protected double[] y;
 
-    public CostChart(double[] data, String title, String xLabel, String yLabel) {
-        XYDataset dataset = createDataset(data);
+    public LineChart(double[] data, String title, String xLabel, String yLabel) {
+        this.title = title;
+        this.xLabel = xLabel;
+        this.yLabel = yLabel;
+        this.x = new double[data.length];
+        this.y = data;
 
-        initUI(dataset);
+        for (int i = 0; i < data.length; i++)
+            this.x[i] = i;
     }
 
-    public CostChart(double[] x, double[] y) {
-        XYDataset dataset = createDataset(x, y);
+    public LineChart(double[] x, double[] y, String title, String xLabel, String yLabel) {
+        this(x,title,xLabel,yLabel);
+        this.x = x;
+    }
 
-        initUI(dataset);
+    public void create() {
+        initUI(createDataset(x,y));
     }
 
     private void initUI(XYDataset dataset) {
@@ -48,7 +58,7 @@ public class CostChart extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    private XYDataset createDataset(double[] bFacts) {
+    protected XYDataset createDataset(double[] bFacts) {
         XYSeries dataset = new XYSeries("Cost");
         for (int i = 0; i < bFacts.length; i++) {
             dataset.add(i, bFacts[i]);
@@ -57,7 +67,7 @@ public class CostChart extends JFrame {
         return new XYSeriesCollection(dataset);
     }
 
-    private XYDataset createDataset(double[] x,double[] y) {
+    protected XYDataset createDataset(double[] x,double[] y) {
         XYSeries dataset = new XYSeries("Cost");
         for (int i = 0; i < x.length; i++) {
             dataset.add(x[i], y[i]);
@@ -66,7 +76,7 @@ public class CostChart extends JFrame {
         return new XYSeriesCollection(dataset);
     }
 
-    private JFreeChart createChart(XYDataset dataset) {
+    protected JFreeChart createChart(XYDataset dataset) {
 
         JFreeChart chart = ChartFactory.createXYLineChart(
                 title,
