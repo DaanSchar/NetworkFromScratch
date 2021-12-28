@@ -3,8 +3,8 @@ package network.neural;
 import network.neural.charts.LineChart;
 import network.neural.layer.Layer;
 import network.neural.layer.LayerOutput;
-import network.neural.util.NDArray;
-import network.neural.util.ObjectIO;
+import network.neural.util.matrix.NDArray;
+import network.neural.util.readwrite.ObjectIO;
 
 import java.io.Serializable;
 import java.util.ArrayList;

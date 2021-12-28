@@ -1,4 +1,4 @@
-package network.neural.util;
+package network.neural.util.matrix;
 
 import network.neural.activationfunctions.IActivationFunction;
 
@@ -38,6 +38,27 @@ public class NDArray implements Serializable {
 
     public NDArray getRow(int row) {
         return new NDArray(new double[][] {data[row]});
+    }
+
+    public NDArray getColumn(int col) {
+        double[][] newData = new double[shape[0]][1];
+
+        for (int i = 0; i < shape[0]; i++)
+            newData[i][0] = data[i][col];
+
+        return new NDArray(newData);
+    }
+
+    public NDArray removeRow(int i) {
+        double[][] newData = new double[shape[0] - 1][shape[1]];
+
+        for (int j = 0; j < shape[0]; j++)
+            if (j < i)
+                newData[j] = data[j];
+            else
+                newData[j - 1] = data[j];
+
+        return new NDArray(newData);
     }
 
     /**
@@ -142,18 +163,6 @@ public class NDArray implements Serializable {
     }
 
 
-    public double get(int i, int j) {
-        return data[i][j];
-    }
-
-    public double[][] data() {
-        return data;
-    }
-
-    public int[] shape() {
-        return Arrays.copyOf(shape, shape.length);
-    }
-
 
     /**
      * runs an NDArray through a given activation function
@@ -232,7 +241,17 @@ public class NDArray implements Serializable {
         return new NDArray(result);
     }
 
+    public double get(int i, int j) {
+        return data[i][j];
+    }
 
+    public double[][] data() {
+        return data;
+    }
+
+    public int[] shape() {
+        return Arrays.copyOf(shape, shape.length);
+    }
 
     @Override
     public String toString() {

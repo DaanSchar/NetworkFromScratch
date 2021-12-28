@@ -1,7 +1,7 @@
 package network.neural.layer;
 
 import network.neural.NeuralNetwork;
-import network.neural.util.NDArray;
+import network.neural.util.matrix.NDArray;
 import network.neural.activationfunctions.IActivationFunction;
 
 import java.io.Serializable;

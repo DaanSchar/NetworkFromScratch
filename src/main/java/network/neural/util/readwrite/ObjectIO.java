@@ -1,4 +1,4 @@
-package network.neural.util;
+package network.neural.util.readwrite;
 
 import java.io.*;
 
