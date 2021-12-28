@@ -1,5 +1,7 @@
-package network.neural;
+package network.neural.layer;
 
+import network.neural.NeuralNetwork;
+import network.neural.util.NDArray;
 import network.neural.activationfunctions.IActivationFunction;
 
 import java.io.Serializable;
@@ -12,7 +14,7 @@ public class Layer implements Serializable {
     private NDArray weights;
     private NDArray bias;
     private IActivationFunction activationFunction;
-    private MultiNetwork network;
+    private NeuralNetwork network;
 
     private NDArray error;
 
@@ -48,11 +50,11 @@ public class Layer implements Serializable {
         return new LayerOutput(z, a);
     }
 
-    public void setNetwork(MultiNetwork network) {
+    public void setNetwork(NeuralNetwork network) {
         this.network = network;
     }
 
-    public MultiNetwork getNetwork() {
+    public NeuralNetwork getNetwork() {
         return network;
     }
 

@@ -1,4 +1,6 @@
-package network.neural;
+package network.neural.layer;
+
+import network.neural.util.NDArray;
 
 public class LayerOutput {
 

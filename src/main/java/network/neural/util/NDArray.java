@@ -1,4 +1,4 @@
-package network.neural;
+package network.neural.util;
 
 import network.neural.activationfunctions.IActivationFunction;
 

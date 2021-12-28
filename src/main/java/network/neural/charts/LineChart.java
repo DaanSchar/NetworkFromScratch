@@ -1,4 +1,4 @@
-package network.neural;
+package network.neural.charts;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -17,9 +17,9 @@ import java.awt.*;
 
 public class LineChart extends JFrame {
 
-    protected String title = "Title";
-    protected String xLabel = "X";
-    protected String yLabel = "Y";
+    protected String title;
+    protected String xLabel;
+    protected String yLabel;
     protected double[] x;
     protected double[] y;
 

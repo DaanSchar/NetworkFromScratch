@@ -1,12 +1,16 @@
-package network.neural;
+package network.neural.old;
 
 import network.neural.activationfunctions.IActivationFunction;
+import network.neural.charts.LineChart;
+import network.neural.util.NDArray;
 
 
 /**
  * "Simple" 2 layer network.
+ *
+ * I'm leaving this class for later use.
  */
-public class Network {
+public class TwoLayerNetwork {
 
     private NDArray weights;
     private NDArray hiddenWeights;
@@ -23,7 +27,7 @@ public class Network {
 
     private double learningRate = 0.01;
 
-    public Network(int numInputs, int hiddenSize, int numOutputs, IActivationFunction activationFunction) {
+    public TwoLayerNetwork(int numInputs, int hiddenSize, int numOutputs, IActivationFunction activationFunction) {
         this.numInputs = numInputs;
         this.activationFunction = activationFunction;
 
@@ -53,14 +57,14 @@ public class Network {
             costs[i] = backpropagation();
         }
 
-//        // plot the cost
-//        CostChart chart = new CostChart(
-//                costs,
-//                "Average Cost",
-//                "Epoch",
-//                "Cost"
-//        );
-//        chart.setVisible(true);
+        // plot the cost
+        LineChart chart = new LineChart(
+                costs,
+                "Average Cost",
+                "Epoch",
+                "Cost"
+        );
+        chart.setVisible(true);
     }
 
     /**
