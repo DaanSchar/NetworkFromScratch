@@ -11,7 +11,7 @@ import java.util.Scanner;
 
 public class ReadIO {
 
-    private static String COMMA_DELIMITER = ";";
+    private static String COMMA_DELIMITER = ",";
 
     public static NDArray readCsv(String filename) {
         List<double[]> records = new ArrayList<>();
@@ -25,6 +25,7 @@ public class ReadIO {
 
         return listToNDArray(records);
     }
+
 
     /**
      * splits a line from a csv file into a double array
@@ -42,23 +43,51 @@ public class ReadIO {
         return stringToDouble(values);
     }
 
+
     /**
      * converts a list of strings to a double array
      */
     private static double[] stringToDouble(List<String> values) {
         double[] valuesDouble = new double[values.size()];
 
-        for (int i = 0; i < values.size(); i++) {
-            try {
-                valuesDouble[i] = Double.parseDouble(values.get(i));
-            } catch (NumberFormatException e) {
-                byte[] stringBytes= values.get(i).getBytes(StandardCharsets.UTF_8);
-                valuesDouble[i] = sum(stringBytes);
-            }
-        }
+        for (int i = 0; i < values.size(); i++)
+            valuesDouble[i] = stringToDouble(values.get(i));
 
         return valuesDouble;
     }
+
+
+    /**
+     * converts a string to a double
+     */
+    private static double stringToDouble(String value) {
+        double valueDouble;
+
+        value = removeChar(value, '"');
+
+        try {
+            valueDouble = Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            byte[] stringBytes= value.getBytes(StandardCharsets.UTF_8);
+            valueDouble = sum(stringBytes);
+        }
+        return valueDouble;
+    }
+
+
+    /**
+     * returns teh string without containing the character c;
+     */
+    private static String removeChar(String value, char c) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < value.length(); i++)
+            if (value.charAt(i) != c)
+                sb.append(value.charAt(i));
+
+        return sb.toString();
+    }
+
 
     /**
      * returns the sum of a byte array, but excludes the " character

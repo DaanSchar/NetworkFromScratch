@@ -10,7 +10,7 @@ public class ObjectIO {
             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
             objectOut.writeObject(serObj);
             objectOut.close();
-            System.out.println("The Object  was succesfully written to a file");
+            System.out.println("The Object  was successfully written to a file");
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -24,7 +24,7 @@ public class ObjectIO {
             ObjectInputStream objectIn = new ObjectInputStream(fileIn);
             obj = objectIn.readObject();
             objectIn.close();
-            System.out.println("The Object  was succesfully read from a file");
+            System.out.println("The Object  was successfully read from a file");
 
         } catch (Exception ex) {
             ex.printStackTrace();
