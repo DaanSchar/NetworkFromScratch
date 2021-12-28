@@ -1,9 +1,19 @@
 package network.neural;
 
+import network.neural.charts.LineChart;
+import network.neural.layer.Layer;
+import network.neural.layer.LayerOutput;
+import network.neural.util.NDArray;
+import network.neural.util.ObjectIO;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class MultiNetwork implements Serializable {
+/**
+ * A multi-layer, fully connected, artificial neural network.
+ * support for arbitrary number of layers with an arbitrary number of neurons.
+ */
+public class NeuralNetwork implements Serializable {
 
     private final ArrayList<Layer> layers;
     private final int inputSize;
@@ -15,7 +25,7 @@ public class MultiNetwork implements Serializable {
     private NDArray yTrain;
 
 
-    public MultiNetwork(int inputSize) {
+    public NeuralNetwork(int inputSize) {
         this.inputSize = inputSize;
         layers = new ArrayList<>();
     }
@@ -26,7 +36,7 @@ public class MultiNetwork implements Serializable {
      *
      * @return the network
      */
-    public MultiNetwork layer(Layer layer) {
+    public NeuralNetwork layer(Layer layer) {
         layer.setNetwork(this);
         layers.add(layer);
         return this;
@@ -39,7 +49,7 @@ public class MultiNetwork implements Serializable {
      * @param learningRate the learning rate
      * @return the network
      */
-    public MultiNetwork learningRate(double learningRate) {
+    public NeuralNetwork learningRate(double learningRate) {
         this.learningRate = learningRate;
         return this;
     }
@@ -48,7 +58,7 @@ public class MultiNetwork implements Serializable {
     /**
      * boolean if you want to see the graph of the cost
      */
-    public MultiNetwork plotCostGraph(boolean graph) {
+    public NeuralNetwork plotCostGraph(boolean graph) {
         this.costGraph = graph;
         return this;
     }
@@ -102,8 +112,8 @@ public class MultiNetwork implements Serializable {
      * @param path location of the file
      * @return the neural network
      */
-    public static MultiNetwork load(String path) {
-        return (MultiNetwork) ObjectIO.readObjectFromFile(path);
+    public static NeuralNetwork load(String path) {
+        return (NeuralNetwork) ObjectIO.readObjectFromFile(path);
     }
 
 

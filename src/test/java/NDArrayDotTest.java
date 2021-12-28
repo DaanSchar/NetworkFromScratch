@@ -1,4 +1,4 @@
-import network.neural.NDArray;
+import network.neural.util.NDArray;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

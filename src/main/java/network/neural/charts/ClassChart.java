@@ -1,4 +1,4 @@
-package network.neural;
+package network.neural.charts;
 
 import java.awt.Color;
 import javax.swing.JFrame;
@@ -9,9 +9,9 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeriesCollection;
 
-public class DataChart extends JFrame {
+public class ClassChart extends JFrame {
 
-    public DataChart(String title, XYSeriesCollection classes) {
+    public ClassChart(String title, XYSeriesCollection classes) {
         super(title);
 
         // Create dataset
