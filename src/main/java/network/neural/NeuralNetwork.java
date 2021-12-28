@@ -1,10 +1,12 @@
 package network.neural;
 
+import me.tongfei.progressbar.ProgressBar;
 import network.neural.charts.LineChart;
 import network.neural.layer.Layer;
 import network.neural.layer.LayerOutput;
-import network.neural.util.NDArray;
-import network.neural.util.ObjectIO;
+import network.neural.util.DataSet;
+import network.neural.util.matrix.NDArray;
+import network.neural.util.readwrite.ObjectIO;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,17 +18,14 @@ import java.util.ArrayList;
 public class NeuralNetwork implements Serializable {
 
     private final ArrayList<Layer> layers;
-    private final int inputSize;
 
     private double learningRate;
     private boolean costGraph;
 
-    private NDArray xTrain;
-    private NDArray yTrain;
+    private DataSet[] batchList;
+    private int m;
 
-
-    public NeuralNetwork(int inputSize) {
-        this.inputSize = inputSize;
+    public NeuralNetwork() {
         layers = new ArrayList<>();
     }
 
@@ -79,20 +78,36 @@ public class NeuralNetwork implements Serializable {
     /**
      * trains the network on the given dataset using backpropagation
      *
-     * @param x the input data
-     * @param y the labels for the input data
+     * @param dataSet the dataset containing x train and y train
      * @param epochs the number of epochs to train for
      */
-    public void train(NDArray x, NDArray y, int epochs) {
-        this.xTrain = x;
-        this.yTrain = y;
-        double[] errors = new double[epochs];
+    public void train(DataSet dataSet, int epochs, int batchSize) {
+        this.batchList = DataSet.batch(dataSet, batchSize);
+        this.m = batchList.length * batchSize;
 
-        for (int i = 0; i < epochs; i++)
-            errors[i] = backpropagation();
+        double[] errors = train(epochs);
 
         if (costGraph)
             createCostGraph(errors);
+    }
+
+    /**
+     * trains the network, but wraps it in a progress bar
+     * @return the errors for each epoch
+     */
+    private double[] train(int epochs) {
+        double[] errors = new double[epochs];
+
+        try (ProgressBar pb = new ProgressBar("Training", epochs)) {
+            for (int i = 0; i < epochs; i++) {
+                for (int j = 0; j < batchList.length; j++) {
+                    errors[i] += backpropagation(j);
+                }
+                pb.step();
+            }
+        }
+
+        return errors;
     }
 
 
@@ -117,10 +132,6 @@ public class NeuralNetwork implements Serializable {
     }
 
 
-    public int getInputSize() {
-        return inputSize;
-    }
-
     public int getOutputSize() {
         return layers.get(layers.size() - 1).getOutputSize();
     }
@@ -143,14 +154,14 @@ public class NeuralNetwork implements Serializable {
      *
      * @return the cost
      */
-    private double backpropagation() {
-        ArrayList<LayerOutput> outputs = forward(xTrain);
+    private double backpropagation(int batchIndex) {
+        ArrayList<LayerOutput> outputs = forward(batchList[batchIndex].getX());
 
-        updateFinalLayerError(outputs.get(outputs.size() - 1));
+        updateFinalLayerError(outputs.get(outputs.size() - 1), batchIndex);
         updateLayerError(outputs);
         updateLayerWeights(outputs);
 
-        return cost(yTrain, outputs.get(outputs.size() - 1).getA()).sum();
+        return cost(batchList[batchIndex].getY(), outputs.get(outputs.size() - 1).getA()).sum();
     }
 
 
@@ -160,9 +171,9 @@ public class NeuralNetwork implements Serializable {
      *
      * @param lastOutput the output of the last layer
      */
-    private void updateFinalLayerError(LayerOutput lastOutput) {
+    private void updateFinalLayerError(LayerOutput lastOutput, int batchIndex) {
         Layer finalLayer = layers.get(layers.size() - 1);
-        NDArray error = costDerivative(yTrain, lastOutput.getA()).mul(lastOutput.getZ().gradient(finalLayer.getActivationFunction())).T();
+        NDArray error = costDerivative(batchList[batchIndex].getY(), lastOutput.getA()).mul(lastOutput.getZ().gradient(finalLayer.getActivationFunction())).T();
         finalLayer.setError(error);
     }
 
@@ -233,7 +244,7 @@ public class NeuralNetwork implements Serializable {
      * @return error squared vector
      */
     private NDArray cost(NDArray y, NDArray yHat) {
-        return y.sub(yHat).pow(2);
+        return y.sub(yHat).pow(2).mul(1.0/(m*2.0));
     }
 
 
@@ -245,7 +256,7 @@ public class NeuralNetwork implements Serializable {
      * @return error' vector
      */
     private NDArray costDerivative(NDArray y, NDArray yHat) {
-        return y.sub(yHat).mul(2);
+        return y.sub(yHat).mul(2.0).mul(1.0/m);
     }
 
 

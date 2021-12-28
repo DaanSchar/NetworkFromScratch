@@ -1,6 +1,6 @@
 package network.neural.layer;
 
-import network.neural.util.NDArray;
+import network.neural.util.matrix.NDArray;
 
 public class LayerOutput {
 

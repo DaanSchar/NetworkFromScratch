@@ -1,6 +1,7 @@
 plugins {
     id 'java'
 }
+apply plugin: 'application'
 
 group 'org.example'
 version '1.0-SNAPSHOT'
@@ -13,7 +14,13 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
     implementation group: 'org.jfree', name: 'jfreechart', version: '1.5.3'
+    implementation 'com.quickbirdstudios:opencv:3.4.1'
+    implementation group: 'me.tongfei', name: 'progressbar', version: '0.9.2'
+
 }
+
+mainClassName = "network.neural.Main"
+
 
 test {
     useJUnitPlatform()

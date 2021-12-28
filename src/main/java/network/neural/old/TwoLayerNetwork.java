@@ -2,7 +2,7 @@ package network.neural.old;
 
 import network.neural.activationfunctions.IActivationFunction;
 import network.neural.charts.LineChart;
-import network.neural.util.NDArray;
+import network.neural.util.matrix.NDArray;
 
 
 /**
