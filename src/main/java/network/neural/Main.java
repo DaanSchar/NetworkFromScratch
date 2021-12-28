@@ -2,7 +2,6 @@ package network.neural;
 
 import network.neural.activationfunctions.ReLU;
 import network.neural.activationfunctions.Sigmoid;
-import network.neural.layers.FinalLayer;
 import network.neural.layers.Layer;
 
 public class Main {
@@ -29,12 +28,9 @@ public class Main {
                 .layer(new Layer(2, 4, new ReLU()))
                 .layer(new Layer(4, 10, new ReLU()))
                 .layer(new Layer(10, 5, new ReLU()))
-                .layer(new FinalLayer(5, 1, new Sigmoid()))
-                .learningRate(0.01);
-        nn.train(input, output, 1000);
-        System.out.println(nn.predict(input));
-//
-//        System.out.println(nn.predict(input));
-//        System.out.println(nn.forward(input));
+                .layer(new Layer(5, 1, new Sigmoid()))
+                .learningRate(0.01)
+                .plotCostGraph(true);
+        nn.train(input, output, 5000);
     }
 }

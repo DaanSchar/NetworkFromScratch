@@ -9,14 +9,13 @@ public class Layer {
 
     private int inputSize;
     private int outputSize;
-    private NDArray error;
 
     private NDArray weights;
     private NDArray bias;
-
+    private IActivationFunction activationFunction;
     private MultiNetwork network;
 
-    private IActivationFunction activationFunction;
+    private NDArray error;
 
     /**
      * layer of neurons with weights and biases.
@@ -50,33 +49,12 @@ public class Layer {
         return new LayerOutput(z, a);
     }
 
-    public void update(NDArray error, double learningRate) {
-        updateWeights(error);
-        updateBias(error);
-    }
-
-    protected void updateWeights(NDArray error) {
-//        weights = weights.add(error)
-    }
-
-    protected void updateBias(NDArray error) {
-
-    }
-
-    public NDArray getError(NDArray errorNextLayer, LayerOutput outputThisLayer) {
-        return weights.T().dot(errorNextLayer);//.mul(outputThisLayer.getZ().gradient(activationFunction).T());
-    }
-
     public void setNetwork(MultiNetwork network) {
         this.network = network;
     }
 
     public MultiNetwork getNetwork() {
         return network;
-    }
-
-    public int getInputSize() {
-        return inputSize;
     }
 
     public int getOutputSize() {
