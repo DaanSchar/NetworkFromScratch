@@ -12,27 +12,33 @@ to run the given example:
 - ```.\gradlew run```
 
 ## Example
- here we create our neural network object with an input size of 2
+Here we create our neural network object and set up our dataset
 ```
-NeuralNetwork nn = new NeuralNetwork(2)
+NeuralNetwork nn = new NeuralNetwork()
+
+DataSet dataSet = DataSet.split(ReadIO.readCsv("BostonHousing.csv"), 1);
+
+NDArray x = dataSet.getX();
+NDArray y = dataSet.getY();
 ```
 
-Add a layer which has the same input size as the network
-the last paramater is an activation function. in this case its a ReLU function
+Add a layer of size 40. The input of a layer must be the same size as the output of the previous, which in this case is our data's feature size.
+the last paramater is an activation function. in this case its a Leaky ReLU function.
 ```
-nn.layer(new Layer(2, 4, new ReLU()))
+nn.layer(new Layer(x.shape[1], 40, new LeakyReLU()))
 
 ```
 
-Add another layer with the inputsize of the previous layer and an output size of 1.
-This layer uses Sigmoid for its activation function.
+Create some more layers.
 ```
-nn.layer(new Layer(4, 1, new Sigmoid()))
+nn.layer(new Layer(100, 10, new LeakyReLU()))
+  .layer(new Layer(10, 10, new LeakyReLU()))
+  .layer(new Layer(10, y.shape()[1], new LeakyReLU()));
 ```
 
-Define a learning rate
+Define an appropriate learning rate.
 ```
-nn.learningRate(0.01)
+nn.learningRate(0.00001);
 ```
 
 If we would like to see the progress of the cost function:
@@ -40,30 +46,17 @@ If we would like to see the progress of the cost function:
 nn.plotCostGraph(true)
 ```
 
-Define our training data using an NDArray object
+Train the network
 ```
-        NDArray xTrain = new NDArray(new double[][]{
-                {0, 0},
-                {0, 1},
-                {1, 0},
-                {1, 1},
-        });
-        NDArray yTrain = new NDArray(new double[][]{
-                {0},
-                {0},
-                {0},
-                {1},
-        }); 
+int epochs = 1000
+int batchSize = 50
+
+nn.train(dataSet, epochs, batchSize);
 ```
 
-Train the network using the following data for 5000 epochs
+Predict the labels using the trained network.
 ```
-nn.train(xTrain, yTrain, 5000);
-```
-
-Predict the labels using the trained network
-```
-NDArray result = nn.predict(xTrain);
+NDArray result = nn.predict(x);
 ```
 
 
