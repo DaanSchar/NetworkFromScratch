@@ -65,7 +65,7 @@ NDArray result = nn.predict(x);
 
 ## Valuable sources
 
-Check out [this lecture](https://www.youtube.com/watch?v=Ixl3nykKG9M&list=WL&index=2), which tells you all about the maths behind neural networks.
+Check out [this lecture](https://www.youtube.com/watch?v=Ixl3nykKG9M&t=6045s), which tells you all about the maths behind neural networks.
 
 the lecture is inspired by these books:
 - [The Matrix Calculus You Need For Deep Learning](https://arxiv.org/abs/1802.01528)
