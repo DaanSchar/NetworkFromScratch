@@ -26,7 +26,6 @@ Add a layer of size 40. The input of a layer must be the same size as the output
 the last paramater is an activation function. in this case its a Leaky ReLU function.
 ```
 nn.layer(new Layer(x.shape[1], 40, new LeakyReLU()))
-
 ```
 
 Create some more layers.
